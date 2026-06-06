@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>App Link Converter & Mobile Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #0f172a;
+            font-size: 22px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #475569;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1e293b;
+        }
+
+        .form-group input[type="text"], 
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: #0284c7;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+        }
+
+        .btn-download-code {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+        }
+
+        .btn-download-code:hover { opacity: 0.9; }
+        .btn-download-code:active { transform: scale(0.98); }
+
+        hr { margin: 25px 0; border: 0; border-top: 1px solid #e2e8f0; }
+
+        .preview-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .app-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+
+        .app-icon {
+            width: 75px;
+            height: 75px;
+            border-radius: 16px;
+            object-fit: cover;
+            background-color: #e2e8f0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .app-info { flex-grow: 1; display: flex; flex-direction: column; gap: 2px; }
+        .app-name { font-size: 16px; font-weight: 700; color: #0f172a; }
+        .app-developer { font-size: 13px; color: #64748b; margin-bottom: 10px; }
+        
+        .app-button {
+            display: inline-block;
+            text-align: center;
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+            align-self: flex-start;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: #0284c7;
+            margin-top: 6px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Smart App Link Converter</h2>
+    <p class="subtitle">Tempel link apa saja, sistem akan mendeteksi otomatis</p>
+    
+    <div class="form-group">
+        <label for="inputName">Nama Aplikasi</label>
+        <input type="text" id="inputName" placeholder="Contoh: Aplikasi Portofolio" oninput="updateCard()">
+    </div>
+
+    <div class="form-group">
+        <label for="inputDev">Developer</label>
+        <input type="text" id="inputDev" placeholder="Contoh: Nama Anda / Perusahaan" oninput="updateCard()">
+    </div>
+
+    <div class="form-group">
+        <label for="inputFile">Pilih Ikon Aplikasi</label>
+        <input type="file" id="inputFile" accept="image/*" onchange="previewImage(event)">
+    </div>
+
+    <div class="form-group">
+        <label for="inputLink">Masukkan Link Tujuan</label>
+        <input type="text" id="inputLink" placeholder="Tempel link Play Store atau Website/Chrome di sini..." oninput="updateCard()">
+        <div class="help-text" id="helpText">Sistem otomatis mendeteksi format Android Intent & Deep Link.</div>
+    </div>
+
+    <hr>
+
+    <div class="preview-title">Live Preview Tampilan</div>
+
+    <div class="app-card" id="finalCard">
+        <img id="appIcon" class="app-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='75' height='75' viewBox='0 0 75 75'><rect width='75' height='75' fill='%23cbd5e1'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%2364748b'>Icon</text></svg>" alt="Icon">
+        <div class="app-info">
+            <div id="appName" class="app-name">Nama Aplikasi Anda</div>
+            <div id="appDev" class="app-developer">Nama Developer</div>
+            <a id="appLink" class="app-button" href="#" target="_blank">Buka Aplikasi</a>
+        </div>
+    </div>
+
+    <button class="btn-download-code" onclick="downloadHTML()">Unduh Aplikasi HP (.html)</button>
+</div>
+
+<div class="watermark">By DITZZ</div>
+
+<script>
+    let base64Image = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'><rect width='192' height='192' fill='%230284c7'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='32' fill='%23ffffff'>App</text></svg>";
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64Image = e.target.result;
+                document.getElementById('appIcon').src = base64Image;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // FUNGSI UTAMA: Otomatis mendeteksi tipe link yang diinput user
+    function analyzeAndProcessLink(rawLink) {
+        if (!rawLink) return { url: "#", text: "Buka Aplikasi", mode: "web" };
+        
+        let link = rawLink.trim();
+
+        // 1. DETEKSI OTOMATIS: Jika link mengandung Play Store
+        if (link.includes('play.google.com') || link.includes('market://')) {
+            let packageId = link;
+            if (link.includes('id=')) {
+                packageId = link.split('id=')[1].split('&')[0];
+            }
+            return {
+                url: `market://details?id=${packageId}`,
+                text: "Download di Play Store",
+                mode: "playstore"
+            };
+        } 
+        
+        // 2. DETEKSI OTOMATIS: Jika link adalah website/google/chrome biasa
+        else {
+            // Bersihkan teks http/https terlebih dahulu untuk format intent Chrome
+            let cleanUrl = link.replace(/^https?:\/\//i, '');
+            return {
+                url: `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end;`,
+                text: "Buka di Chrome",
+                mode: "chrome"
+            };
+        }
+    }
+
+    function updateCard() {
+        const name = document.getElementById('inputName').value;
+        const dev = document.getElementById('inputDev').value;
+        const rawLink = document.getElementById('inputLink').value;
+        const helpText = document.getElementById('helpText');
+
+        // Panggil fungsi deteksi otomatis
+        const result = analyzeAndProcessLink(rawLink);
+
+        // Update teks panduan live berdasarkan deteksi
+        if (rawLink) {
+            if (result.mode === "playstore") {
+                helpText.innerText = "Terdeteksi: Link Play Store! Aplikasi akan otomatis membuka Google Play Store HP.";
+                helpText.style.color = "#10b981"; // Hijau sukses
+            } else {
+                helpText.innerText = "Terdeteksi: Link Web/Chrome! Aplikasi akan memaksa HP membuka Google Chrome.";
+                helpText.style.color = "#0ea5e9"; // Biru info
+            }
+        } else {
+            helpText.innerText = "Sistem otomatis mendeteksi format Android Intent & Deep Link.";
+            helpText.style.color = "#0284c7";
+        }
+
+        document.getElementById('appName').innerText = name ? name : "Nama Aplikasi Anda";
+        document.getElementById('appDev').innerText = dev ? dev : "Nama Developer";
+        document.getElementById('appLink').href = result.url;
+        document.getElementById('appLink').innerText = result.text;
+    }
+
+    function downloadHTML() {
+        const name = document.getElementById('inputName').value || "Aplikasi Saya";
+        const dev = document.getElementById('inputDev').value || "Developer";
+        const rawLink = document.getElementById('inputLink').value || "#";
+        
+        // Ambil data link hasil deteksi otomatis untuk dimasukkan ke file download
+        const result = analyzeAndProcessLink(rawLink);
+
+        const manifestObject = {
+            "short_name": name,
+            "name": name,
+            "icons": [{ "src": base64Image, "type": "image/png", "sizes": "192x192" }],
+            "start_url": ".",
+            "background_color": "#0f172a",
+            "theme_color": "#1e3a8a",
+            "display": "standalone",
+            "orientation": "portrait"
+        };
+        const manifestDataUri = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifestObject));
+
+        const outputHTML = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${name}</title>
+    <link rel="manifest" href="${manifestDataUri}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="${name}">
+    <link rel="apple-touch-icon" href="${base64Image}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 20px; position: relative;
+        }
+        .app-container { background: #fff; border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        .app-icon { width: 110px; height: 110px; border-radius: 24px; object-fit: cover; box-shadow: 0 8px 16px rgba(0,0,0,0.12); margin-bottom: 20px; }
+        .app-name { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .app-developer { font-size: 14px; color: #64748b; margin-bottom: 30px; }
+        .app-button { display: block; text-align: center; background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%); color: white; text-decoration: none; padding: 14px 20px; font-size: 15px; font-weight: 700; border-radius: 14px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4); text-transform: uppercase; }
+        .instructions { margin-top: 25px; font-size: 11px; color: #94a3b8; line-height: 1.4; }
+        .watermark { position: fixed; bottom: 15px; right: 20px; color: rgba(255, 255, 255, 0.5); font-size: 12px; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <img class="app-icon" src="${base64Image}" alt="Icon">
+        <div class="app-name">${name}</div>
+        <div class="app-developer">Oleh ${dev}</div>
+        <a class="app-button" href="${result.url}" target="_blank">${result.text}</a>
+        <div class="instructions">Klik opsi browser lalu pilih<br><b>"Tambahkan ke Layar Utama"</b><br>untuk memasang di HP.</div>
+    </div>
+    <div class="watermark">By DITZZ</div>
+</body>
+</html>`;
+
+        const blob = new Blob([outputHTML], { type: "text/html" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${name.replace(/\s+/g, '-').toLowerCase()}-app.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+</body>
+</html>
